@@ -1,15 +1,40 @@
 from typing import Optional
-
 from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+class Blog(BaseModel):
+    title: str
+    body: str
+    published: Optional[bool]
+
+@app.get('/blog')
+def index(limit):
+    return {'data': f'{limit} blogs from the db'}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+@app.get('/blog/unpublished')
+def unpublished():
+    return {'data': 'unpublished blogs'}
+
+
+@app.get('/blog/{id}')
+def show(id: int):
+    return {'data': id}
+
+
+@app.get('/blog/{id}/comments')
+def comments(id):
+    return {'data': {'1', '2'}}
+
+
+@app.post('/blog')
+def create_blog(blog: Blog):
+    return {'data': f"Blog is created with title as {blog.title}"}
+
+
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="127.0.0.1", port=9000)
